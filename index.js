@@ -1,32 +1,27 @@
-const {createServer} = require("node:http")
-const fs = require("node:fs")
+const express = require("express")
+const app = express()
 
-const hostname = "localhost"
-const port = 8080
-const routes = {
-    "/":"./index.html",
-    "/about":"./about.html",
-    "/contact-me":"./contact-me.html"
-}
 
-const server = createServer((req, res)=>{
-
-    const reqPage = req.url
-    let filePath = routes[reqPage] || "./404.html"
-
-    fs.readFile(filePath, (err, data)=>{
-        if(err){
-            res.statusCode = 500
-            res.setHeader("Content-Type", "text/plain")
-            res.end("Error loading file")
-        }else{
-            res.statusCode = 200
-            res.setHeader("Content-Type", "text/html")
-            res.end(data)
-        }
-    })
+app.get("/",(req, res)=>{
+    res.sendFile(__dirname + "/public/index.html")
 })
 
-server.listen(port, hostname, ()=>{
-    console.log(`Server running at http://${hostname}:${port}/`)
+app.get("/about", (req, res)=>{
+    res.sendFile(__dirname + "/public/about.html")
+})
+
+app.get("/contact-me", (req, res)=>{
+    res.sendFile(__dirname + "/public/contact-me.html")
+})
+const PORT = 3000
+
+app.use((req, res) =>{
+    res.status(404).sendFile(__dirname + "/public/404.html")
+})
+
+app.listen(PORT, (error)=>{
+    if(error){
+        throw error
+    }
+    console.log(`Server is running at http://localhost:${PORT}`)
 })
